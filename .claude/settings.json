@@ -1,0 +1,61 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git checkout *)",
+      "Bash(git branch *)",
+      "Bash(git pull)",
+      "Bash(git merge *)",
+      "Bash(gh pr *)",
+      "Bash(gh run *)",
+      "Bash(gh issue *)",
+      "Bash(gh label *)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(echo *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(grep *)",
+      "Bash(ruff *)",
+      "Bash(mypy *)",
+      "Bash(prettier *)",
+      "Bash(eslint *)",
+      "Bash(bash scripts/*)",
+      "Bash(docker compose *)",
+      "Bash(docker ps *)",
+      "Bash(kill *)",
+      "Bash(lsof *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | bash)",
+      "Bash(docker rm *)",
+      "Bash(docker rmi *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=\"$CLAUDE_TOOL_RESULT_FILE\"; if [[ \"$FILE\" == *.py ]]; then ruff format \"$FILE\" && ruff check --fix \"$FILE\"; elif [[ \"$FILE\" == *.ts || \"$FILE\" == *.tsx || \"$FILE\" == *.js || \"$FILE\" == *.jsx ]]; then npx prettier --write \"$FILE\"; fi; if [[ \"$FILE\" == *.test.ts || \"$FILE\" == *.test.tsx ]]; then bash scripts/check-test-modifications.sh; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

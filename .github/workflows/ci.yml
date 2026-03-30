@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run typecheck
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+      - run: npm run test:coverage
+
+  check-models:
+    runs-on: ubuntu-latest
+    outputs:
+      has_models: ${{ steps.check.outputs.has_models }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for Prisma models
+        id: check
+        run: |
+          MODEL_COUNT=$(grep -c '^model ' prisma/schema.prisma || true)
+          if [ "$MODEL_COUNT" -gt 0 ]; then
+            echo "has_models=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_models=false" >> $GITHUB_OUTPUT
+            echo "No models in schema.prisma — integration tests will be skipped"
+          fi
+
+  test-integration:
+    runs-on: ubuntu-latest
+    needs: check-models
+    if: needs.check-models.outputs.has_models == 'true'
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+      DIRECT_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - run: npm run test:integration
+
+  claude-review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

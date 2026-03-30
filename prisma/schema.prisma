@@ -1,0 +1,23 @@
+// Prisma schema
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Neon requires unpooled connection for migrations
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// Add your models here.
+// Example:
+//
+// model User {
+//   id        String   @id @default(cuid())
+//   email     String   @unique
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
