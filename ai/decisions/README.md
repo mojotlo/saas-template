@@ -15,6 +15,8 @@ when a decision changes or new context emerges.
 | [ADR-003](ADR-003-auth.md) | Auth — Clerk | Accepted | MAU costs exceed $25/mo, or need self-hosted |
 | [ADR-004](ADR-004-testing.md) | Testing — Vitest + Playwright | Accepted | Framework switch (Next.js, etc.) |
 | [ADR-005](ADR-005-ci.md) | CI — GitHub Actions + Claude Review | Accepted | Team grows, need more sophisticated pipelines |
+| [ADR-006](ADR-006-billing.md) | Billing — Stripe + Svix | Accepted | Fees too high, need usage-based billing, or Stripe deprecates API version |
+| [ADR-007](ADR-007-ui-components.md) | UI Components — Radix UI + shadcn pattern + Tailwind v4 | Accepted | shadcn releases official Tailwind v4 support |
 
 ## How to use these
 

@@ -10,6 +10,9 @@ Read the following files before doing any work, in this order:
 4. `ai/repo-map.md` — where to find things in this repository
 5. `ai/allowed-changes.md` — what you are and are not allowed to do
 
+> **CRITICAL:** Read CLAUDE.md and all ai/ files listed above BEFORE any implementation.
+> Do not skip this step. Every workflow violation in past sessions traces to skipping this.
+
 ---
 
 ## Quick Reference
@@ -37,8 +40,12 @@ npx prisma db push          # push schema changes without a migration (prototypi
 ### Stack
 - **Language:** TypeScript (strict mode)
 - **Runtime:** Node.js
-- **Package manager:** [npm / pnpm / yarn — fill in]
-- **Test framework:** [Jest / Vitest / etc — fill in]
+- **Package manager:** npm
+- **Test framework:** Vitest
+- **Frontend:** Next.js 16 (App Router), React 19, Tailwind v4, shadcn/ui
+- **Auth:** Clerk (`@clerk/nextjs`)
+- **Payments:** Stripe (subscriptions, webhooks)
+- **Database:** PostgreSQL via Neon + Prisma
 
 ### Key Rules (full details in ai/ files)
 - Tests must pass after every change
@@ -96,22 +103,44 @@ that Claude Code can execute in Plan mode.
 
 ## Project Brief
 
-> Replace this section when cloning the template.
-> Keep it short — 1-3 paragraphs. Claude reads this every session.
->
-> Cover:
-> - What this app does and who it's for
-> - The core problem it solves
-> - Any business rules or domain context Claude needs to understand
-> - Areas that are frozen or sensitive
-> - Anything Claude has done wrong before in this repo
+This is a Next.js SaaS starter template with Clerk authentication and Stripe subscription billing.
+It is meant to be cloned and customized — the business logic layer is intentionally minimal so
+developers can layer in their own domain logic on top of the auth + billing foundation.
+
+Key domain rules:
+- Users are created/synced from Clerk via webhook (`api/webhooks/clerk`)
+- Subscriptions are created/synced from Stripe via webhook (`api/webhooks/stripe`)
+- `src/domain/subscription/subscription.ts` holds all access-control logic — no DB calls
+- Money values are always integers in cents — use `src/domain/money/money.ts` for all monetary math
 
 ---
 
 ## Project-Specific Notes
 
-> Replace this section when cloning the template.
-> Add anything Claude should know about this specific project:
-> - non-obvious decisions that have already been made
-> - third-party services in use (with links to their docs)
-> - known gotchas or areas of complexity
+**Third-party services:**
+- Clerk (auth): https://clerk.com/docs — user management, social providers, webhooks
+- Stripe (billing): https://stripe.com/docs — subscriptions, customer portal, webhooks
+- Neon (database): https://neon.tech/docs — serverless Postgres, requires both pooled + direct URLs
+
+**Non-obvious decisions:**
+- The `User.id` in Prisma is the Clerk user ID (not a cuid) — this is intentional to avoid a join
+- `stripeCustomerId` on User is set by the `checkout.session.completed` webhook, not at signup
+- Plans are seeded manually into the DB — there is no admin UI for plan management yet
+- Tailwind v4 is in use: theme variables are defined via `@theme` in `globals.css`, not `tailwind.config.ts`
+- The `src/infrastructure/stripe/client.ts` singleton must be the only place Stripe is instantiated
+
+**Webhook setup required:**
+1. Clerk: add endpoint `POST /api/webhooks/clerk` — subscribe to `user.created`, `user.updated`, `user.deleted`
+2. Stripe: add endpoint `POST /api/webhooks/stripe` — subscribe to `checkout.session.completed`, `customer.subscription.*`
+3. Copy signing secrets into `.env` as `CLERK_WEBHOOK_SECRET` and `STRIPE_WEBHOOK_SECRET`
+
+**Local webhook testing:**
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
+
+**SDK version discipline:**
+- When using Clerk, Stripe, or any third-party SDK, verify the actual installed version's exports before writing code (`node -e "console.log(Object.keys(require('package')))"` or check the `.d.ts` files). Do not assume APIs from memory — they change between major versions.
+
+**Slash commands:**
+- Slash commands in `.claude/commands/` (e.g. `/simplify`, `/verify`, `/code-review`, `/commit-push-pr`) can be executed by reading the command file and launching an Agent with those instructions. They are not available via the Skill tool.

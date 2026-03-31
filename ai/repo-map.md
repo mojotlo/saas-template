@@ -2,43 +2,63 @@
 
 Use this file to quickly locate functionality before making changes.
 
-> This is a template. Update all sections when starting a new project.
-
 ---
 
 ## Directory Structure
 
 ```
 /
-├── CLAUDE.md                   # AI entry point — read first
-├── .claude/                    # Claude Code configuration
-│   ├── settings.json           # permissions and PostToolUse hooks
-│   └── commands/               # slash commands
-│       ├── commit-push-pr.md
-│       ├── verify.md
-│       ├── code-review.md
-│       └── simplify.md
-├── .mcp.json                   # MCP servers (Playwright)
-├── .github/
-│   └── workflows/
-│       └── ci.yml              # lint, typecheck, test, Claude review
-├── ai/                         # AI context files
-│   ├── system-invariants.md
-│   ├── agent-bootstrap.md
-│   ├── ai-guide.md
-│   ├── repo-map.md             # this file
-│   └── allowed-changes.md
+├── CLAUDE.md                         # AI entry point — read first
+├── next.config.ts                    # Next.js configuration
+├── tailwind.config.ts                # Tailwind v4 (minimal — theme is in globals.css)
+├── postcss.config.js                 # Uses @tailwindcss/postcss
+├── .claude/                          # Claude Code configuration
+│   ├── settings.json
+│   └── commands/
+├── .github/workflows/ci.yml          # lint, typecheck, test, Claude review
 ├── prisma/
-│   ├── schema.prisma           # Database schema and models
-│   └── migrations/             # Migration history — commit these
+│   ├── schema.prisma                 # User, Plan, Subscription models
+│   └── migrations/                   # Migration history — always commit
 ├── src/
-│   ├── domain/                 # Core business logic
-│   ├── services/               # Workflows and orchestration
+│   ├── middleware.ts                  # Clerk auth middleware — protects all non-public routes
+│   ├── lib/
+│   │   └── utils.ts                  # cn() helper for Tailwind class merging
+│   ├── components/
+│   │   └── ui/                       # shadcn-style components (Button, Card, Badge, etc.)
+│   ├── domain/
+│   │   ├── money/                    # Pure monetary math (Money type, formatMoney, etc.)
+│   │   └── subscription/             # Subscription access rules (hasActiveAccess, etc.)
+│   ├── services/
+│   │   └── billing/
+│   │       ├── checkoutService.ts    # Creates Stripe Checkout Session
+│   │       ├── portalService.ts      # Creates Stripe Customer Portal session
+│   │       └── subscriptionSyncService.ts  # Syncs Stripe subscription → DB
 │   ├── infrastructure/
-│   │   └── database/
-│   │       └── client.ts       # Prisma client singleton — import this, not @prisma/client directly
-│   └── utils/                  # Reusable helpers
-└── tests/                      # Test suite
+│   │   ├── database/
+│   │   │   └── client.ts             # Prisma singleton — always import from here
+│   │   └── stripe/
+│   │       └── client.ts             # Stripe singleton — always import from here
+│   └── app/                          # Next.js App Router
+│       ├── layout.tsx                # Root layout — ClerkProvider wraps everything
+│       ├── globals.css               # Tailwind v4 @theme + CSS variable definitions
+│       ├── (auth)/
+│       │   ├── sign-in/[[...sign-in]]/page.tsx
+│       │   └── sign-up/[[...sign-up]]/page.tsx
+│       ├── (marketing)/
+│       │   ├── layout.tsx            # Public nav header + footer
+│       │   └── page.tsx              # Landing + pricing page
+│       ├── (dashboard)/
+│       │   ├── layout.tsx            # Sidebar nav + user button
+│       │   ├── dashboard/page.tsx    # Dashboard home
+│       │   └── settings/billing/page.tsx  # Billing management + plan upgrade
+│       └── api/
+│           ├── webhooks/
+│           │   ├── clerk/route.ts    # Syncs users from Clerk (user.created/updated/deleted)
+│           │   └── stripe/route.ts   # Syncs subscriptions from Stripe
+│           └── billing/
+│               ├── checkout/route.ts # POST → returns Stripe Checkout URL
+│               └── portal/route.ts   # POST → returns Stripe Portal URL
+└── tests/                            # Test suite (colocated tests also in src/)
 ```
 
 ---
@@ -47,52 +67,68 @@ Use this file to quickly locate functionality before making changes.
 
 | Type of change | Location |
 |---|---|
-| Business logic / rules | `src/domain/` |
-| Workflow / multi-step processes | `src/services/` |
-| API calls, DB queries, file I/O | `src/infrastructure/` |
-| Generic reusable helpers | `src/utils/` |
-| Behavior verification | `tests/` |
+| Subscription access rules | `src/domain/subscription/subscription.ts` |
+| Monetary calculations | `src/domain/money/money.ts` |
+| Checkout / portal flow | `src/services/billing/` |
+| Stripe API calls | `src/infrastructure/stripe/client.ts` + services |
+| DB queries | `src/infrastructure/database/client.ts` (Prisma) |
+| New pages / routes | `src/app/` |
+| Reusable UI components | `src/components/ui/` |
+| Auth protection rules | `src/middleware.ts` |
 
 ---
 
 ## Key Modules
 
-> Fill this section in when cloning the template.
-> List the main modules and what they do.
-
 | Module | Path | Responsibility |
 |---|---|---|
-| [example] UserAuth | `src/domain/auth/` | Validates credentials, manages sessions |
-| [example] EmailService | `src/infrastructure/email/` | Sends transactional email via SendGrid |
+| Money | `src/domain/money/money.ts` | Pure monetary math — all amounts in cents |
+| Subscription | `src/domain/subscription/subscription.ts` | Access control rules — no DB calls |
+| CheckoutService | `src/services/billing/checkoutService.ts` | Creates Stripe Checkout Session |
+| PortalService | `src/services/billing/portalService.ts` | Creates Stripe Customer Portal session |
+| SubscriptionSync | `src/services/billing/subscriptionSyncService.ts` | Upserts subscription from Stripe webhook |
+| Stripe client | `src/infrastructure/stripe/client.ts` | Stripe singleton |
+| Prisma client | `src/infrastructure/database/client.ts` | Prisma singleton |
+| Clerk webhook | `src/app/api/webhooks/clerk/route.ts` | Creates/updates/deletes User in DB |
+| Stripe webhook | `src/app/api/webhooks/stripe/route.ts` | Handles subscription lifecycle events |
 
 ---
 
 ## Entry Points
 
-> Fill in the main entry points for this project.
-
 | Entry point | Path | Description |
 |---|---|---|
-| [example] API server | `src/index.ts` | Starts the HTTP server |
-| [example] Worker | `src/worker.ts` | Background job processor |
+| Marketing site | `src/app/(marketing)/page.tsx` | Landing + pricing page |
+| Dashboard | `src/app/(dashboard)/dashboard/page.tsx` | Authenticated dashboard home |
+| Billing settings | `src/app/(dashboard)/settings/billing/page.tsx` | Manage/upgrade subscription |
+| Clerk webhook | `src/app/api/webhooks/clerk/route.ts` | User sync from Clerk |
+| Stripe webhook | `src/app/api/webhooks/stripe/route.ts` | Subscription sync from Stripe |
 
 ---
 
 ## Frozen / Sensitive Areas
 
-> List any modules that should not be modified without explicit discussion.
-
 | Area | Reason |
 |---|---|
-| [example] `src/infrastructure/payments/` | PCI-sensitive, requires security review |
+| `src/infrastructure/stripe/client.ts` | Single Stripe instantiation point — do not add a second |
+| `src/infrastructure/database/client.ts` | Single Prisma instantiation point — always import from here |
+| `src/app/api/webhooks/` | Webhook signature verification must not be removed |
 
 ---
 
 ## External Dependencies
 
-> List key third-party dependencies and what they're used for.
-> Update this when dependencies change.
-
 | Package | Purpose |
 |---|---|
-| [fill in] | |
+| `next` | App framework (App Router) |
+| `@clerk/nextjs` | Auth — user management, session, social providers |
+| `stripe` | Stripe API client (server-only) |
+| `@stripe/stripe-js` | Stripe.js (client-side, for future Stripe Elements use) |
+| `svix` | Clerk webhook signature verification |
+| `@prisma/client` + `prisma` | ORM + migrations |
+| `tailwindcss` v4 | Styling |
+| `@tailwindcss/postcss` | Tailwind v4 PostCSS plugin |
+| `class-variance-authority` | Component variant styling (shadcn pattern) |
+| `clsx` + `tailwind-merge` | Class name utilities |
+| `lucide-react` | Icons |
+| `@radix-ui/*` | Accessible UI primitives |
