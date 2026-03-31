@@ -1,90 +1,144 @@
-# Claude Template
+# SaaS Template
 
-A base project template for AI-assisted TypeScript development with Claude Code.
+A Next.js SaaS starter with Clerk auth, Stripe subscriptions, and shadcn/ui — built for AI-assisted development with Claude Code.
 
 ---
 
 ## What's Included
 
-- **Claude Code config** — slash commands, permissions, PostToolUse formatting hook
-- **GitHub Actions CI** — typecheck, lint, test, and Claude code review on every PR
-- **Prisma + Neon** — PostgreSQL setup with a clean infrastructure layer
-- **Prettier + ESLint** — TypeScript formatting and linting pre-configured
-- **Playwright MCP** — browser visibility for Claude's verification loop
+- **Next.js 16** — App Router, React 19, Tailwind v4
+- **Clerk auth** — sign-in/up, social providers, middleware, user sync webhook
+- **Stripe subscriptions** — checkout, customer portal, webhook sync, monthly/annual plans
+- **shadcn/ui** — Radix primitives styled with Tailwind (Button, Card, Badge, Separator)
+- **Prisma + Neon** — PostgreSQL with User, Plan, Subscription models
+- **Domain layer** — pure subscription access rules and monetary math
+- **Integration tests** — subscription sync tested against real Postgres via Docker
+- **Claude Code config** — slash commands, ADRs, CI with Claude code review
 
 ---
 
-## Using This Template
+## Quick Start
 
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/mojotlo/template.git my-project
-cd my-project
+git clone https://github.com/mojotlo/saas-template.git my-saas
+cd my-saas
 npm install
 ```
 
 ### 2. Set up environment variables
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Fill in your database credentials from your [Neon dashboard](https://neon.tech).
-You need two connection strings — pooled for app queries, direct for migrations:
+Fill in credentials from:
+- **[Neon](https://neon.tech)** — `DATABASE_URL` (pooled) and `DIRECT_DATABASE_URL` (direct)
+- **[Clerk](https://dashboard.clerk.com)** — publishable key, secret key, webhook secret
+- **[Stripe](https://dashboard.stripe.com)** — secret key, webhook secret, price IDs
 
-```
-DATABASE_URL=postgresql://...?pgbouncer=true
-DIRECT_DATABASE_URL=postgresql://...
-```
-
-### 3. Update project-specific files
-
-- `package.json` — update `name`, add your actual `dev` script
-- `CLAUDE.md` — fill in stack details and project-specific notes
-- `ai/repo-map.md` — map your actual modules as you build them
-- `ai/allowed-changes.md` — add any frozen or sensitive areas
-
-### 4. Set up GitHub Actions
-
-Add `CLAUDE_CODE_OAUTH_TOKEN` as a repository secret (Settings → Secrets → Actions).
-Generate the token by running `claude setup-token` in your terminal.
-
-### 5. Add your first database model
-
-Edit `prisma/schema.prisma`, add your models, then run:
+### 3. Set up the database
 
 ```bash
-npx prisma migrate dev --name init
+npx prisma migrate dev
 ```
 
-This creates your first migration and generates the Prisma client.
-Always import the client from `src/infrastructure/database/client.ts`,
-never directly from `@prisma/client`.
+### 4. Seed a plan
+
+Create at least one Plan row with your Stripe price IDs. Example via Prisma Studio:
+
+```bash
+npx prisma studio
+```
+
+Or create a seed script at `prisma/seed.ts`.
+
+### 5. Configure webhooks
+
+**Clerk** (Dashboard → Webhooks):
+- Endpoint: `https://your-domain.com/api/webhooks/clerk`
+- Events: `user.created`, `user.updated`, `user.deleted`
+
+**Stripe** (Dashboard → Webhooks):
+- Endpoint: `https://your-domain.com/api/webhooks/stripe`
+- Events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`
+
+For local development:
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
+
+### 6. Run
+
+```bash
+npm run dev
+```
 
 ---
 
-## Parallel Development with Worktrees
+## Project Structure
 
-Work on multiple features simultaneously using git worktrees — each issue gets
-its own directory and branch, with its own Claude Code session.
+```
+src/
+├── app/                          # Next.js App Router
+│   ├── (auth)/                   # Sign-in, sign-up pages
+│   ├── (marketing)/              # Landing page with pricing
+│   ├── (dashboard)/              # Protected dashboard + billing settings
+│   └── api/
+│       ├── webhooks/clerk/       # User sync from Clerk
+│       ├── webhooks/stripe/      # Subscription sync from Stripe
+│       └── billing/              # Checkout + portal session endpoints
+├── domain/
+│   ├── money/                    # Pure monetary math (cents-based)
+│   └── subscription/             # Access rules, billing interval logic
+├── services/billing/             # Checkout, portal, subscription sync
+├── infrastructure/
+│   ├── database/client.ts        # Prisma singleton
+│   └── stripe/client.ts          # Stripe singleton
+├── components/ui/                # shadcn-style components
+└── middleware.ts                 # Clerk auth — protects non-public routes
 
-```bash
-# Start a new feature (creates worktree + branch + opens Claude Code)
-npm run worktree:new 3
-# Claude Code opens in ../my-project-issue-3
-# Tell it: "Implement issue #3"
-
-# After PR is merged, clean up
-npm run worktree:cleanup 3
-# Removes directory, deletes branch, pulls latest main
+prisma/
+├── schema.prisma                 # User, Plan, Subscription models
+└── migrations/                   # Always commit these
 ```
 
-Run multiple worktrees in parallel from separate terminal tabs. Each Claude Code
-session is isolated — no conflicts between parallel agents.
+Dependency direction: `infrastructure → services → domain`. Domain never imports from services or infrastructure.
 
-**Tip:** Enable "Automatically delete head branches" in your GitHub repo settings
-(Settings → General) so remote branches clean up automatically on merge.
+---
+
+## Commands
+
+```bash
+npm run dev              # Next.js dev server
+npm run build            # production build
+npm start                # serve production build
+npm run typecheck        # TypeScript type check
+npm run lint             # ESLint
+npm test                 # unit tests (Vitest)
+npm run test:coverage    # unit tests with coverage
+npm run test:integration # integration tests (requires Docker)
+npm run test:e2e         # end-to-end tests (Playwright)
+```
+
+```bash
+npx prisma migrate dev       # create and apply a migration
+npx prisma migrate deploy    # apply migrations in production
+npx prisma generate          # regenerate client after schema changes
+npx prisma studio            # open database GUI
+```
+
+---
+
+## Subscription Flow
+
+1. User signs up via Clerk → `user.created` webhook creates a `User` row
+2. User clicks a plan on the pricing or billing page → API creates a Stripe Checkout Session
+3. User completes checkout → `checkout.session.completed` saves `stripeCustomerId` on User
+4. Stripe fires `customer.subscription.created` → subscription synced to DB
+5. Dashboard reads subscription status via pure domain functions (`hasActiveAccess`, etc.)
+6. User manages subscription via Stripe Customer Portal (`/api/billing/portal`)
 
 ---
 
@@ -99,61 +153,31 @@ Code mode        → implement; Claude loops until tests pass
 /commit-push-pr  → commit, push, open PR, monitor CI
 ```
 
-The PR is the human gate. CI runs automatically on every PR.
-
 ---
 
-## Commands
+## Parallel Development with Worktrees
 
 ```bash
-npm run dev          # start development server
-npm run build        # production build
-npm run typecheck    # TypeScript type check
-npm run lint         # lint check
-npm test             # run test suite
-```
-
-```bash
-npx prisma migrate dev       # create and apply a migration
-npx prisma migrate deploy    # apply migrations in production
-npx prisma generate          # regenerate client after schema changes
-npx prisma studio            # open database GUI
+npm run worktree:new 3       # creates worktree + branch for issue #3
+npm run worktree:cleanup 3   # removes worktree after PR is merged
 ```
 
 ---
 
-## Architecture
+## CI
 
-```
-src/
-├── domain/              # Pure business logic — no side effects
-├── services/            # Orchestration — composes domain logic
-├── infrastructure/
-│   └── database/
-│       └── client.ts    # Prisma client singleton
-└── utils/               # Stateless helpers
-
-prisma/
-├── schema.prisma        # Database schema
-└── migrations/          # Migration history — always commit these
-```
-
-Dependency direction: `infrastructure → services → domain`. Domain never
-imports from services or infrastructure.
+GitHub Actions runs on every PR: lint, typecheck, unit tests, integration tests, and Claude code review. Add `CLAUDE_CODE_OAUTH_TOKEN` as a repository secret and install the [Claude GitHub App](https://github.com/apps/claude).
 
 ---
 
 ## AI Context Files
 
-Claude reads these files at the start of every session:
-
 | File | Purpose |
 |---|---|
-| `CLAUDE.md` | Entry point — stack details, workflow, project notes |
+| `CLAUDE.md` | Entry point — stack, workflow, project notes |
 | `ai/system-invariants.md` | Rules that must never be violated |
 | `ai/agent-bootstrap.md` | Task workflow and planning process |
 | `ai/ai-guide.md` | Architecture and implementation patterns |
 | `ai/repo-map.md` | Where to find things in this repo |
 | `ai/allowed-changes.md` | What Claude can and cannot change |
-
-Update these files whenever Claude does something wrong so it won't repeat the mistake.
+| `ai/decisions/` | Architecture Decision Records |
