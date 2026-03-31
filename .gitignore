@@ -22,3 +22,12 @@ test-results/
 
 # Docker
 .docker/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# clerk configuration (can include secrets)
+/.clerk/

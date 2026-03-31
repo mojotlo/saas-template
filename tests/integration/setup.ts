@@ -9,7 +9,10 @@ import { prisma } from '../../src/infrastructure/database/client'
 //   await prisma.user.deleteMany()
 
 beforeEach(async () => {
-  // Add cleanup here as you add models to schema.prisma
+  // Children before parents — delete in reverse dependency order
+  await prisma.subscription.deleteMany()
+  await prisma.user.deleteMany()
+  await prisma.plan.deleteMany()
 })
 
 afterAll(async () => {

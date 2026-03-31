@@ -12,12 +12,55 @@ datasource db {
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
-// Add your models here.
-// Example:
-//
-// model User {
-//   id        String   @id @default(cuid())
-//   email     String   @unique
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+// Synced from Clerk via webhook on user.created / user.updated / user.deleted
+model User {
+  id               String        @id // Clerk user ID (e.g. "user_abc123")
+  email            String        @unique
+  stripeCustomerId String?       @unique
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  subscription     Subscription?
+}
+
+// Represents a Stripe product/price pair — seeded manually or via admin
+model Plan {
+  id                   String         @id @default(cuid())
+  name                 String         // e.g. "Pro", "Enterprise"
+  description          String         @default("")
+  stripePriceIdMonthly String         @unique
+  stripePriceIdAnnual  String         @unique
+  amountMonthly        Int            // cents (e.g. 1900 = $19.00)
+  amountAnnual         Int            // cents (e.g. 19000 = $190.00)
+  currency             String         @default("USD")
+  features             String[]       // display list for pricing page
+  sortOrder            Int            @default(0)
+  createdAt            DateTime       @default(now())
+  subscriptions        Subscription[]
+}
+
+// One active subscription per user — synced from Stripe webhooks
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId               String
+  plan                 Plan               @relation(fields: [planId], references: [id])
+  stripeSubscriptionId String             @unique
+  stripePriceId        String             // active price ID (monthly or annual)
+  status               SubscriptionStatus
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  incomplete
+  incomplete_expired
+  past_due
+  trialing
+  unpaid
+}

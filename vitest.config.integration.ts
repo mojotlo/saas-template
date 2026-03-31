@@ -5,6 +5,11 @@ export default defineConfig({
     // Integration tests — requires Docker Postgres to be running
     // Run: docker compose up -d before executing these tests
     include: ['tests/integration/**/*.test.ts'],
+    // Points to the Docker Postgres instance from docker-compose.yml
+    env: {
+      DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/test',
+      DIRECT_DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/test',
+    },
     globals: true,
     environment: 'node',
     // Run integration tests sequentially to avoid DB conflicts
