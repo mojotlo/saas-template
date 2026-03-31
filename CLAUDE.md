@@ -62,6 +62,7 @@ npx prisma db push          # push schema changes without a migration (prototypi
 Every feature or fix follows this loop. Do not skip steps.
 
 ```
+/load-context    → read all ai/ files and confirm context is loaded (start of every session)
 /spec            → turn a feature idea into a testable GitHub issue (plan mode)
 Plan mode        → review spec, confirm approach before writing any code
 Code mode        → execute the spec; loop until all tests pass
@@ -143,4 +144,4 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 - When using Clerk, Stripe, or any third-party SDK, verify the actual installed version's exports before writing code (`node -e "console.log(Object.keys(require('package')))"` or check the `.d.ts` files). Do not assume APIs from memory — they change between major versions.
 
 **Slash commands:**
-- Slash commands in `.claude/commands/` (e.g. `/simplify`, `/verify`, `/code-review`, `/commit-push-pr`) can be executed by reading the command file and launching an Agent with those instructions. They are not available via the Skill tool.
+- Slash commands in `.claude/commands/` (e.g. `/load-context`, `/simplify`, `/verify`, `/code-review`, `/commit-push-pr`) can be executed by reading the command file and launching an Agent with those instructions. They are not available via the Skill tool.
