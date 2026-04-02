@@ -35,6 +35,7 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │   ├── components/
 │   │   └── ui/                       # shadcn-style components (Button, Card, Badge, etc.)
 │   ├── domain/
+│   │   ├── invoice/                  # Invoice mapping — RawInvoiceData → InvoiceRow
 │   │   ├── money/                    # Pure monetary math (Money type, formatMoney, etc.)
 │   │   └── subscription/             # Subscription access rules (hasActiveAccess, etc.)
 │   ├── services/
@@ -46,7 +47,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │   │   ├── database/
 │   │   │   └── client.ts             # Prisma singleton — always import from here
 │   │   └── stripe/
-│   │       └── client.ts             # Stripe singleton — always import from here
+│   │       ├── client.ts             # Stripe singleton — always import from here
+│   │       └── invoices.ts           # Fetches invoices from Stripe API
 │   └── app/                          # Next.js App Router
 │       ├── layout.tsx                # Root layout — ClerkProvider wraps everything
 │       ├── globals.css               # Tailwind v4 @theme + CSS variable definitions
@@ -59,7 +61,9 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │       ├── (dashboard)/
 │       │   ├── layout.tsx            # Sidebar nav + user button
 │       │   ├── dashboard/page.tsx    # Dashboard home
-│       │   └── settings/billing/page.tsx  # Billing management + plan upgrade
+│       │   └── settings/billing/
+│       │       ├── page.tsx              # Billing management + plan upgrade
+│       │       └── invoices/page.tsx     # Invoice history (Server Component)
 │       └── api/
 │           ├── webhooks/
 │           │   ├── clerk/route.ts    # Syncs users from Clerk (user.created/updated/deleted)
@@ -96,6 +100,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | CheckoutService | `src/services/billing/checkoutService.ts` | Creates Stripe Checkout Session |
 | PortalService | `src/services/billing/portalService.ts` | Creates Stripe Customer Portal session |
 | SubscriptionSync | `src/services/billing/subscriptionSyncService.ts` | Upserts subscription from Stripe webhook |
+| Invoice (domain) | `src/domain/invoice/invoice.ts` | Maps raw invoice data → InvoiceRow using Money module |
+| Invoice (infra) | `src/infrastructure/stripe/invoices.ts` | Fetches invoices from Stripe API |
 | Stripe client | `src/infrastructure/stripe/client.ts` | Stripe singleton |
 | Prisma client | `src/infrastructure/database/client.ts` | Prisma singleton |
 | Clerk webhook | `src/app/api/webhooks/clerk/route.ts` | Creates/updates/deletes User in DB |
@@ -112,6 +118,7 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | Settings (tabbed) | `src/app/(dashboard)/settings/layout.tsx` | Tab shell — Profile + Billing |
 | Profile settings | `src/app/(dashboard)/settings/page.tsx` | Clerk `<UserProfile />` inline |
 | Billing settings | `src/app/(dashboard)/settings/billing/page.tsx` | Manage/upgrade subscription |
+| Invoice history | `src/app/(dashboard)/settings/billing/invoices/page.tsx` | Read-only invoice table (Server Component) |
 | Clerk webhook | `src/app/api/webhooks/clerk/route.ts` | User sync from Clerk |
 | Stripe webhook | `src/app/api/webhooks/stripe/route.ts` | Subscription sync from Stripe |
 
