@@ -1,6 +1,10 @@
-# Repository Map
+# Repository Map (Full)
 
-Use this file to quickly locate functionality before making changes.
+**Scope:** The complete codebase reference — exact file paths, module table, entry points,
+frozen areas, and dependency list. This is a reference document, not instructional.
+The distinction from `ai/core/project-notes.md`: that file contains facts about how
+the project works; this file contains facts about where things live.
+For quick orientation, `ai/core/repo-map.md` is sufficient.
 
 ---
 
@@ -16,6 +20,11 @@ Use this file to quickly locate functionality before making changes.
 │   ├── settings.json
 │   └── commands/
 ├── .github/workflows/ci.yml          # lint, typecheck, test, Claude review
+├── ai/
+│   ├── core/                         # Always-read context files
+│   ├── supplementary/                # Read on demand (see CLAUDE.md for when)
+│   ├── decisions/                    # ADRs — read when touching architecture
+│   └── sessions/                     # Planning notes from /spec sessions
 ├── prisma/
 │   ├── schema.prisma                 # User, Plan, Subscription models
 │   └── migrations/                   # Migration history — always commit

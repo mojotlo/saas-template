@@ -1,6 +1,9 @@
 # Allowed Changes
 
-AI agents working in this repository must stay within the following scope.
+**Scope:** What actions Claude is permitted to take in this repository.
+The distinction from `system-invariants.md`: that file governs how code must be written;
+this file governs what Claude is authorized to do. When in doubt about whether an
+action is permitted, read this file before proceeding.
 
 If a requested change requires work outside these rules, stop and request clarification.
 
@@ -20,7 +23,7 @@ The agent may:
 - split a file that has exceeded the size limit (300–500 lines)
 - create or update ADRs in `ai/decisions/` when introducing new patterns
 
-All changes must follow the workflow defined in `agent-bootstrap.md`
+All changes must follow the workflow defined in `ai/core/agent-bootstrap.md`
 and the rules in `CLAUDE.md`.
 
 ---
@@ -72,14 +75,6 @@ Do not proceed and explain afterward.
 ---
 
 ## Project-Specific Overrides
-
-> Fill this section in when cloning the template.
-> Use it to add project-specific restrictions or permissions.
-
-Examples:
-- "Do not modify the `src/infrastructure/payments/` module — it is frozen pending security review"
-- "The `src/domain/pricing/` module may be freely refactored"
-- "Always run `npm run db:validate` after any schema-adjacent change"
 
 | Rule | Reason |
 |---|---|

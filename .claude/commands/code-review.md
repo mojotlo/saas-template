@@ -7,8 +7,8 @@ the repository itself.
 ## Context discovery
 
 1. Run `git diff main` to see all changes
-2. Read `ai/ai-guide.md` to understand the architecture rules and patterns
-3. Read `ai/system-invariants.md` to understand the rules that must never be violated
+2. Read `ai/supplementary/ai-guide.md` to understand the architecture rules and patterns
+3. Read `ai/core/system-invariants.md` to understand the rules that must never be violated
 4. Read `ai/decisions/README.md` to understand the current tech stack decisions
 
 ## Review

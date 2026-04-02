@@ -77,7 +77,7 @@ Present them numbered, like:
 Proposed CLAUDE.md update #1:
 Pattern: Claude repeatedly tried to run prisma generate before checking for models
 Addition: "Always check for models in schema.prisma before running prisma generate"
-Section: Project-Specific Notes
+Section: Project Brief (or ai/supplementary/repo-map.md Gotchas if implementation-specific)
 
 Approve? (yes / no / modify)
 ```

@@ -42,8 +42,7 @@ gh issue view "$ISSUE"
 echo "─────────────────────────────────────────"
 echo ""
 
-# Open Claude Code in the new worktree
+# Open Claude Code in the new worktree with load-context pre-seeded
 echo "→ Opening Claude Code in $WORKTREE_PATH..."
-echo "   Tip: tell Claude 'Implement issue #$ISSUE'"
 echo ""
-cd "$WORKTREE_PATH" && claude
+cd "$WORKTREE_PATH" && claude "/load-context then implement issue #$ISSUE"

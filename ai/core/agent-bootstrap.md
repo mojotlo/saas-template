@@ -1,6 +1,9 @@
 # Agent Bootstrap
 
-You are working in an AI-assisted TypeScript/Node.js repository.
+**Scope:** How to work — the session process, task workflow, and TDD mechanics.
+Not for what you're allowed to do (that's `ai/supplementary/allowed-changes.md`),
+not for how to write code (that's `ai/supplementary/ai-guide.md`),
+not for project-specific facts (that's `ai/core/project-notes.md`).
 
 Before touching any code, read the context files in CLAUDE.md in order.
 This file defines your working process once you have that context.
@@ -11,7 +14,7 @@ This file defines your working process once you have that context.
 
 When given a task, follow these steps exactly:
 
-1. **Identify the relevant module** using `repo-map.md`
+1. **Identify the relevant module** using `ai/core/repo-map.md` (or `ai/supplementary/repo-map.md` for full detail)
 2. **Read related tests** before reading implementation code
 3. **Plan the smallest change** that satisfies the task
 4. **State your plan** before writing any code — confirm if uncertain
@@ -37,6 +40,9 @@ Do not start a code session without a spec that has passed the testability check
 3. Use the acceptance criteria as the definition of done
    — each criterion must map to a test case
 4. Reference the issue number in the PR body as "Closes #<N>"
+
+**Issue templates** live in `.github/ISSUE_TEMPLATE/` (`feature.md`, `bug.md`).
+Priority labels: P0 (critical), P1 (important), P2 (nice to have).
 
 A good plan:
 - names the specific files to be changed
@@ -74,20 +80,7 @@ describe what was built.
 1. Run `/simplify` — only after all tests are green
 2. Tests must stay green throughout
 
-### Test modification rules
-
-Once a test is committed, it is frozen. You may:
-- Add new tests
-- Add new `describe` blocks
-
-You may NOT without explicit human approval:
-- Modify existing test assertions
-- Delete existing tests
-- Add `.skip` or `.todo` to existing tests
-- Weaken assertions (e.g. `toBe(x)` → `toBeDefined()`)
-
-If you believe an existing test is incorrect, stop and explain why.
-Do not change it. Wait for human confirmation before proceeding.
+> Test modification rules are in `ai/core/system-invariants.md` under "Test Integrity".
 
 ### What to do when acceptance criteria are too vague
 
@@ -103,7 +96,7 @@ software is supposed to do — that's a human decision.
 
 ## Scope Discipline
 
-Before starting, check `allowed-changes.md`.
+Before starting any implementation task, read `ai/supplementary/allowed-changes.md`.
 
 If the task requires work outside allowed scope:
 1. Stop
@@ -176,38 +169,6 @@ If a subagent fails after 3 attempts to fix the issue, stop and ask for human in
 
 /wrap-session is optional — skip it for small fixes, docs updates, and dependency bumps.
 Invoke it whenever something went wrong, a retry was needed, or an architecture decision was made.
-
----
-
-## When to Bail
-
-Some sessions should be abandoned rather than continued. Run `/bail` when:
-
-- Tests have failed more than 3 times on the same issue
-- The approach turned out to be fundamentally wrong
-- The scope has expanded beyond the original issue
-- An architecture violation was discovered that requires rethinking the approach
-- Context window is above 80% and quality is visibly degrading
-- Claude is making changes to files outside the original plan
-
-Do not try to recover a session that should be bailed. Bail fast, capture the
-learning, and start fresh with a better plan.
-
-**Bail vs catchup:**
-- `/catchup` — session is paused but healthy, continue where you left off
-- `/bail` — session is going sideways, abandon and capture the learning
-
----
-
-## Resuming an Interrupted Session
-
-If you are starting a session in a worktree that already has commits or changes
-from a previous session, run `/catchup` before doing anything else.
-
-The pattern is:
-1. `/clear` — clears the context window to free up tokens
-2. `/catchup` — re-orients to the current state of the branch
-3. Continue from where the previous session left off
 
 ---
 

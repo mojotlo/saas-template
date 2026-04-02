@@ -1,6 +1,9 @@
 # System Invariants
 
-These rules must always remain true. Do not introduce changes that violate them.
+**Scope:** Absolute constraints that apply to every task regardless of context.
+If violating a rule here could corrupt the codebase in a way that's hard to undo, it lives here.
+Not for conventions or preferences — those belong in `ai/supplementary/ai-guide.md`.
+
 If completing a task would require violating an invariant, stop and request clarification.
 
 ---
@@ -108,9 +111,3 @@ Do not introduce new architectural styles, frameworks, or libraries unless expli
 
 Do not add, remove, or upgrade npm dependencies without explicit instruction.
 Dependency changes affect security, licensing, and bundle size — they require human review.
-
-## Database Access
-
-Always import the Prisma client from `src/infrastructure/database/client.ts`.
-Never import directly from `@prisma/client` outside of that file.
-Never run `prisma db push` in production — always use `prisma migrate deploy`.

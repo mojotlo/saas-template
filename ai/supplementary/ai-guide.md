@@ -1,35 +1,11 @@
 # Architecture & Patterns Guide
 
-This file describes the architecture of this project and the implementation
-patterns to follow. Read this before writing any code.
-
----
-
-## Architecture
-
-This project uses a modular layered architecture.
-
-### Layers
-
-```
-src/domain/           Core business logic — pure functions, no side effects
-src/services/         Workflows and orchestration — composes domain logic
-src/infrastructure/   External systems — APIs, databases, file system, queues
-src/utils/            Reusable helpers — stateless, generic utilities
-```
-
-### Dependency Direction
-
-```
-infrastructure → services → domain
-```
-
-- `domain` has no dependencies on other layers
-- `services` may use `domain` and `utils`
-- `infrastructure` may use `services`, `domain`, and `utils`
-- `utils` has no layer dependencies
-
-If you find yourself importing infrastructure from domain, stop — that's an architecture violation.
+**Scope:** Conventions for how to write code in this codebase — TypeScript rules,
+function/module/state/error/naming patterns. The distinction from `system-invariants.md`:
+that file contains constraints (things that must never happen); this file contains
+conventions (the right way to do things when there's a choice).
+Layer locations and dependency rules are in `ai/core/system-invariants.md`
+and `ai/core/repo-map.md` — not repeated here.
 
 ---
 
@@ -125,19 +101,7 @@ Use folder, file, and function names together to embed semantic meaning —
 
 ## Testing
 
-Tests define correct behavior. Read them before reading implementation.
-
 - One test file per module, colocated or in `tests/`
-- Test behavior, not implementation details
-- Tests should be readable as documentation
-- If a test is hard to write, the code probably needs to be simpler
-
----
-
-## Development Strategy
-
-- Keep modules small and focused
-- Isolate side effects at the infrastructure boundary
-- Pure functions in domain logic wherever possible
-- Orchestration belongs in services, not domain
-- When uncertain: inspect tests, inspect nearby modules, follow existing patterns
+- Test behavior, not implementation details — tests should read as documentation
+- If a test is hard to write, the implementation is probably too complex
+- Read existing tests before reading implementation code

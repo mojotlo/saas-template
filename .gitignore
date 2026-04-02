@@ -31,3 +31,6 @@ tsconfig.tsbuildinfo
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Informal to-do (not tracked in git)
+to-do.md

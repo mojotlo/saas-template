@@ -9,34 +9,48 @@ This is not optional. Do not proceed until all files are read.
 
 ```bash
 cat CLAUDE.md
-cat ai/system-invariants.md
-cat ai/agent-bootstrap.md
-cat ai/ai-guide.md
-cat ai/repo-map.md
-cat ai/allowed-changes.md
-cat ai/decisions/README.md
+cat ai/core/system-invariants.md
+cat ai/core/agent-bootstrap.md
+cat ai/core/repo-map.md
+cat ai/core/project-notes.md
 ```
+
+Do not read the supplementary files during load-context. They are loaded on demand
+when the task requires them, as described in CLAUDE.md.
+
+## Then name the session
+
+Run the following to detect the branch and name the session:
+
+```bash
+git branch --show-current
+```
+
+- If the branch is `feat/issue-N`, run `gh issue view N --json title -q .title` to get
+  the issue title, then execute `/rename "#N: [title]"`
+- If the branch is `main` or there is no issue branch, execute `/rename "main: [brief description of task]"`
 
 ## Then confirm
 
-After reading all files, respond with:
+After reading all files and renaming, respond with:
 
 ```
 ✅ Session initialized. I have read:
 - CLAUDE.md — [one sentence summary of the project brief]
-- system-invariants.md — [number] invariants loaded
-- agent-bootstrap.md — workflow and TDD rules loaded
-- ai-guide.md — architecture: [one sentence summary of layers]
-- repo-map.md — [number] key modules mapped
-- allowed-changes.md — scope boundaries loaded
-- decisions/README.md — [number] ADRs loaded
+- core/system-invariants.md — [number] invariants loaded
+- core/agent-bootstrap.md — workflow and TDD rules loaded
+- core/repo-map.md — layer map loaded
+- core/project-notes.md — [number] project-specific notes loaded
+
+Supplementary files (ai-guide, allowed-changes, full repo-map, ADRs) will be
+loaded when the task requires them.
 
 Ready. What would you like to work on?
 ```
 
 ## Rules
 
-- Do not summarize or skip any file — read the full content of each
+- Do not summarize or skip any core file — read the full content of each
 - Do not begin any task until this confirmation is complete
 - If a file is missing, report which one is missing before proceeding
 - If the Project Brief in CLAUDE.md is still a placeholder (contains "> Replace this"),
