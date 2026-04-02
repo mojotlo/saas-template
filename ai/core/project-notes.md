@@ -24,6 +24,10 @@ Add a note here whenever Claude makes the same mistake twice.
 
 - Tailwind v4 is in use: theme variables are defined via `@theme` in `globals.css`, not in `tailwind.config.ts`
 
+## Testing
+
+- Unit tests cover domain logic only. The app layer (`src/app/`) is excluded from vitest coverage — UI features are verified via Playwright e2e, not component tests. Do not add `@testing-library/react` or jsdom without explicit instruction.
+
 ## Database migrations
 
 - Use `migrate dev` in development, `migrate deploy` in CI/production

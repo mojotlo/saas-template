@@ -109,6 +109,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 |---|---|---|
 | Marketing site | `src/app/(marketing)/page.tsx` | Landing + pricing page |
 | Dashboard | `src/app/(dashboard)/dashboard/page.tsx` | Authenticated dashboard home |
+| Settings (tabbed) | `src/app/(dashboard)/settings/layout.tsx` | Tab shell — Profile + Billing |
+| Profile settings | `src/app/(dashboard)/settings/page.tsx` | Clerk `<UserProfile />` inline |
 | Billing settings | `src/app/(dashboard)/settings/billing/page.tsx` | Manage/upgrade subscription |
 | Clerk webhook | `src/app/api/webhooks/clerk/route.ts` | User sync from Clerk |
 | Stripe webhook | `src/app/api/webhooks/stripe/route.ts` | Subscription sync from Stripe |
