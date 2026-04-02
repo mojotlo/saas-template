@@ -64,3 +64,16 @@ enum SubscriptionStatus {
   trialing
   unpaid
 }
+
+/// Tracks processed webhook events for idempotency.
+/// Prevents duplicate handling when Stripe or Clerk retries delivery.
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  eventId     String
+  source      String   // "stripe" | "clerk"
+  eventType   String   // e.g. "customer.subscription.updated"
+  processedAt DateTime @default(now())
+
+  @@unique([eventId, source])
+  @@index([processedAt])
+}

@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { stripe } from '@/infrastructure/stripe/client'
 import { prisma } from '@/infrastructure/database/client'
 import { syncSubscription, deleteSubscription } from '@/services/billing/subscriptionSyncService'
+import { isEventProcessed, markEventProcessed } from '@/services/webhook/webhookEventService'
 import type Stripe from 'stripe'
 
 export async function POST(req: Request) {
@@ -25,6 +26,10 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
   } catch {
     return new Response('Invalid webhook signature', { status: 400 })
+  }
+
+  if (await isEventProcessed(event.id, 'stripe')) {
+    return new Response('OK', { status: 200 })
   }
 
   switch (event.type) {
@@ -57,6 +62,8 @@ export async function POST(req: Request) {
       break
     }
   }
+
+  await markEventProcessed(event.id, 'stripe', event.type)
 
   return new Response('OK', { status: 200 })
 }

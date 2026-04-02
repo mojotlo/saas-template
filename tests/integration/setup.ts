@@ -10,6 +10,7 @@ import { prisma } from '../../src/infrastructure/database/client'
 
 beforeEach(async () => {
   // Children before parents — delete in reverse dependency order
+  await prisma.webhookEvent.deleteMany()
   await prisma.subscription.deleteMany()
   await prisma.user.deleteMany()
   await prisma.plan.deleteMany()
