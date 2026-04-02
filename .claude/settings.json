@@ -4,10 +4,22 @@
       "trust": true
     }
   },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["playwright"],
   "permissions": {
     "allow": [
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_close",
       "Bash(npm run *)",
       "Bash(npm test:*)",
+      "Bash(curl -s http://localhost:*)",
+      "Bash(curl -s -o /dev/null -w * http://localhost:*)",
+      "Bash(sleep *)",
       "Bash(npx *)",
       "Bash(node *)",
       "Bash(git status)",
