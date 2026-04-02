@@ -42,6 +42,11 @@ gh issue view "$ISSUE"
 echo "─────────────────────────────────────────"
 echo ""
 
+# Install dependencies in the new worktree
+echo "→ Installing dependencies..."
+npm install
+echo ""
+
 # Open Claude Code in the new worktree with load-context pre-seeded
 echo "→ Opening Claude Code in $WORKTREE_PATH..."
 echo ""
