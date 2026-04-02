@@ -1,4 +1,9 @@
 {
+  "mcpServers": {
+    "playwright": {
+      "trust": true
+    }
+  },
   "permissions": {
     "allow": [
       "Bash(npm run *)",
