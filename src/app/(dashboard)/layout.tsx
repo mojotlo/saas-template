@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import { UserButton } from '@clerk/nextjs'
-import { LayoutDashboard, CreditCard, Settings } from 'lucide-react'
+import { LayoutDashboard, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/settings/billing', label: 'Billing', icon: CreditCard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
