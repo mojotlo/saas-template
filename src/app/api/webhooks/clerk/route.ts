@@ -1,7 +1,8 @@
 import { headers } from 'next/headers'
 import { Webhook } from 'svix'
 import { prisma } from '@/infrastructure/database/client'
-import type { WebhookEvent } from '@clerk/nextjs/server'
+import { isEventProcessed, markEventProcessed } from '@/services/webhook/webhookEventService'
+import type { WebhookEvent as ClerkWebhookEvent } from '@clerk/nextjs/server'
 
 export async function POST(req: Request) {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET
@@ -23,16 +24,20 @@ export async function POST(req: Request) {
   const body = JSON.stringify(payload)
 
   const wh = new Webhook(webhookSecret)
-  let event: WebhookEvent
+  let event: ClerkWebhookEvent
 
   try {
     event = wh.verify(body, {
       'svix-id': svixId,
       'svix-timestamp': svixTimestamp,
       'svix-signature': svixSignature,
-    }) as WebhookEvent
+    }) as ClerkWebhookEvent
   } catch {
     return new Response('Invalid webhook signature', { status: 400 })
+  }
+
+  if (await isEventProcessed(svixId, 'clerk')) {
+    return new Response('OK', { status: 200 })
   }
 
   switch (event.type) {
@@ -72,6 +77,8 @@ export async function POST(req: Request) {
       break
     }
   }
+
+  await markEventProcessed(svixId, 'clerk', event.type)
 
   return new Response('OK', { status: 200 })
 }
