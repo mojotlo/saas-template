@@ -34,3 +34,4 @@ tsconfig.tsbuildinfo
 
 # Informal to-do (not tracked in git)
 to-do.md
+.claude/worktrees/
