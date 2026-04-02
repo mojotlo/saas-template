@@ -1,25 +1,15 @@
 # Wrap Session
 
-You are a subagent. You have been spawned at the end of a feature build session
-to write a session log, identify patterns, and propose CLAUDE.md updates for
-human approval. Discover everything you need from the repository and git history.
+You are running in the current session with full context of what just happened.
+Your job is to capture lessons, write a session log, and propose any CLAUDE.md
+updates for human approval — before the context is lost to /commit-push-pr.
 
-## Step 1 — Gather context
+---
 
-Run the following to understand what happened this session:
+## Step 1 — Ask the human one question
 
-```bash
-git log main..HEAD --oneline          # commits made this session
-git diff main --stat                  # files changed
-git diff main                         # full diff
-cat test-results/summary.txt          # final test state
-```
-
-Also ask the human one question before proceeding:
-
-> "Before I write the session log, please run /cost in your Claude Code session
-> and paste the token count here. Also rate this session:
-> smooth / some friction / went sideways"
+> "Before I write the session log, please run /cost and paste the token count.
+> Also rate this session: smooth / some friction / went sideways"
 
 Wait for their response before continuing.
 
@@ -54,55 +44,73 @@ If everything went smoothly, write "No significant failures.">
 during this session that aren't already documented in ai/decisions/>
 
 ## Patterns noticed
-<Anything Claude got wrong, got confused about, or had to retry multiple times.
-These are candidates for CLAUDE.md updates.>
+<Anything that caused confusion, required retries, or revealed a gap in the
+context files. These are candidates for CLAUDE.md or project-notes updates.>
 
 ## Open questions
 <Anything unresolved that the next session should pick up.>
 ```
 
-## Step 3 — Propose CLAUDE.md updates
+## Step 3 — Update the repo map
 
-Based on the "Patterns noticed" section, identify specific additions to CLAUDE.md
-that would prevent the same confusion in future sessions.
+If any new modules, files, routes, or external dependencies were added this session,
+update the relevant repo-map sections now:
 
-For each proposed update:
-1. State the pattern you observed
-2. Write the exact text you'd add to CLAUDE.md
-3. State which section it belongs in
+- New module or significant file → add to `ai/supplementary/repo-map.md` Key Modules table
+- New entry point (page, API route) → add to Entry Points table
+- New frozen area → add to Frozen / Sensitive Areas table
+- New npm dependency → add to External Dependencies table
+- New layer or singleton → update `ai/core/repo-map.md`
 
-Present them numbered, like:
+If nothing structural changed, skip this step.
+
+## Step 4 — Propose updates
+
+Based on "Patterns noticed", identify specific additions that would prevent
+the same confusion in future sessions. Route each to the most specific file
+that owns that scope:
+
+| Type of lesson | Destination |
+|---|---|
+| Absolute rule that must never be broken | `ai/core/system-invariants.md` |
+| Workflow or process confusion | `ai/core/agent-bootstrap.md` |
+| Layer or singleton location | `ai/core/repo-map.md` |
+| Project-specific gotcha or domain rule | `ai/core/project-notes.md` |
+| Code convention or naming confusion | `ai/supplementary/ai-guide.md` |
+| Scope / authorization confusion | `ai/supplementary/allowed-changes.md` |
+| Exact file path or module detail | `ai/supplementary/repo-map.md` |
+| Project overview or session workflow | `CLAUDE.md` |
+
+Present proposals numbered, like:
 
 ```
-Proposed CLAUDE.md update #1:
-Pattern: Claude repeatedly tried to run prisma generate before checking for models
-Addition: "Always check for models in schema.prisma before running prisma generate"
-Section: Project Brief (or ai/supplementary/repo-map.md Gotchas if implementation-specific)
+Proposed update #1:
+Pattern: <what caused the confusion>
+Addition: "<exact text to add>"
+File: <which file>
+Section: <which section>
 
 Approve? (yes / no / modify)
 ```
 
-Wait for approval on each one before applying any of them.
+Wait for approval on each before applying any.
 
-## Step 4 — Apply approved updates
+## Step 5 — Apply approved updates
 
-For each approved update:
-- Edit CLAUDE.md to add the approved text to the specified section
-- Confirm each edit was applied
+Edit the appropriate files and confirm each edit was applied.
 
-## Step 5 — Commit the session log
+## Step 6 — Stage the session log
 
 ```bash
 git add ai/sessions/
-git add CLAUDE.md   # if any updates were approved
-git commit -m "docs: add session log for <branch name>"
-git push
 ```
+
+The session log will be included in the commit that /commit-push-pr creates next.
 
 ## Rules
 
-- Never update CLAUDE.md without explicit approval for each change
+- Never update any context file without explicit approval for each change
 - Never skip the /cost prompt — token data is important even if approximate
 - If the session was smooth with no failures, the log is short — that's fine
 - Session logs are permanent record — be honest, not optimistic
-- If patterns suggest a systemic issue (not just a one-off), flag it clearly
+- Draw on your live memory of the session, not just git artifacts

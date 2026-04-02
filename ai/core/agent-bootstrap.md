@@ -138,6 +138,19 @@ pattern not already in the codebase:
 Do not introduce new dependencies or architectural patterns without a documented decision.
 This is not optional — undocumented decisions are not allowed changes.
 
+## Keeping the Repo Map Current
+
+After implementing any change that adds or removes structure, update the repo map
+before ending the session. Do not leave this for /wrap-session to catch.
+
+| What changed | Where to update |
+|---|---|
+| New module or significant file added | `ai/supplementary/repo-map.md` Key Modules |
+| New page or API route added | `ai/supplementary/repo-map.md` Entry Points |
+| New frozen / sensitive area | `ai/supplementary/repo-map.md` Frozen Areas |
+| New npm dependency | `ai/supplementary/repo-map.md` External Dependencies |
+| New layer or critical singleton | `ai/core/repo-map.md` |
+
 ---
 
 ## Subagent Invocation
@@ -157,18 +170,18 @@ Implementation complete + tests passing
     → if verify reports failures: fix them, then re-run /verify
   → invoke /code-review
     → if code-review reports Must Fix items: fix them, then re-run /code-review
+  → offer /wrap-session — ask the human: "Run wrap-session before committing?
+    Recommended if: retries occurred, approach changed, or architecture decisions were made.
+    Skip if: smooth session with no surprises."
+    → if yes: run /wrap-session now, while context is live
+    → human approves any proposed CLAUDE.md updates before they are applied
   → invoke /commit-push-pr
     → subagent owns CI monitoring until green
-  → invoke /wrap-session (for significant feature builds only)
-    → human approves any proposed CLAUDE.md updates before they are applied
 ```
 
 Do not invoke a later subagent until the earlier one has reported success.
 Do not skip subagents — each one catches a different class of problems.
 If a subagent fails after 3 attempts to fix the issue, stop and ask for human input.
-
-/wrap-session is optional — skip it for small fixes, docs updates, and dependency bumps.
-Invoke it whenever something went wrong, a retry was needed, or an architecture decision was made.
 
 ---
 
