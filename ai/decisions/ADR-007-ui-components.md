@@ -40,3 +40,22 @@ Icons from `lucide-react`. Class name merging via `clsx` + `tailwind-merge` (exp
 - PostCSS plugin: `@tailwindcss/postcss` (not the v3 `tailwindcss` plugin)
 - Color tokens use CSS custom properties (`--background`, `--foreground`, etc.) on `:root` and `.dark`
 - `tailwind.config.ts` exists but is minimal — only `darkMode: 'class'`
+
+---
+
+## Toast notifications — Sonner
+
+**Added:** 2026-04-01
+
+Toast notifications use [Sonner](https://sonner.emilkowal.dev/) (`sonner` v2.x, ~3kb). Sonner is the shadcn/ui recommended toast library.
+
+**Why Sonner:**
+- Standalone `toast()` function — no React context or hook required to trigger toasts
+- Built-in variants: `toast.success()`, `toast.error()`, `toast()`, `toast.warning()`
+- Supports CSS variable theming — maps directly to project theme tokens
+- Accessible: manages focus, ARIA live regions, keyboard dismiss
+
+**Integration:**
+- `src/components/ui/sonner.tsx` — thin `<Toaster />` wrapper with project defaults
+- Mounted once in `src/app/layout.tsx`
+- CSS variable overrides in `src/app/globals.css` (`:root` and `.dark`)

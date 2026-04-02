@@ -95,6 +95,13 @@
   --ring: 224.3 76.3% 48%;
 }
 
+/* Sonner toast overrides — map normal toasts to project theme */
+[data-sonner-toaster] {
+  --normal-bg: hsl(var(--card));
+  --normal-border: hsl(var(--border));
+  --normal-text: hsl(var(--card-foreground));
+}
+
 * {
   border-color: hsl(var(--border));
 }
