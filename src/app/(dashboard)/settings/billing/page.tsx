@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -66,6 +67,12 @@ export default function BillingPage() {
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  function showError(err: unknown) {
+    const message = err instanceof Error ? err.message : 'Something went wrong'
+    setError(message)
+    toast.error(message)
+  }
+
   async function handleCheckout(plan: PricingPlan) {
     const priceId = interval === 'monthly' ? plan.stripePriceIdMonthly : plan.stripePriceIdAnnual
     setLoading(plan.name)
@@ -74,7 +81,7 @@ export default function BillingPage() {
       const url = await startCheckout(priceId)
       if (url) window.location.href = url
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      showError(err)
     } finally {
       setLoading(null)
     }
@@ -87,7 +94,7 @@ export default function BillingPage() {
       const url = await openPortal()
       if (url) window.location.href = url
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      showError(err)
     } finally {
       setLoading(null)
     }
