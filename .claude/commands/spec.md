@@ -137,7 +137,7 @@ Only now, create the issue using `gh issue create` with the feature template:
 ```bash
 gh issue create \
   --title "<feature name>" \
-  --label "feature" \
+  --label "enhancement" \
   --body "$(cat <<'EOF'
 ## What
 <one sentence>
