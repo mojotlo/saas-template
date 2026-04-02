@@ -10,7 +10,8 @@ testability check at the end.
 Before asking the human to describe the feature:
 
 1. Read `to-do.md` — check if this feature is already in the backlog
-2. Check `ai/sessions/` for any planning notes matching this topic (files named `planning-*.md`)
+2. If it is, note any `*(needs: ...)*` dependency annotation on that item
+3. Check `ai/sessions/` for any planning notes matching this topic (files named `planning-*.md`)
 
 If a planning note exists:
 - Summarize what was already decided
@@ -130,7 +131,34 @@ If a split is needed:
 
 If no split is needed, proceed directly to Step 9.
 
-## Step 9 — Create the GitHub issue
+## Step 9 — Update to-do.md and commit to main
+
+Before creating the GitHub issue, update `to-do.md` to reflect the current state.
+
+**If this feature is in the backlog:**
+1. Mark it as in-progress by changing `- [ ]` to `- [🔄]`
+2. Update or add the dependency annotation based on what was found in Step 7:
+   - If blocked: `*(needs: #N Title)*`
+   - If no dependencies: `*(needs: none)*`
+   - If it must merge before others, add a note to those items: `*(needs: this)*`
+
+**If this feature is NOT in the backlog:**
+1. Add it to the appropriate section with `- [🔄]` and the dependency annotation
+
+**Then commit the to-do update directly to main:**
+```bash
+git stash                          # stash any in-progress work on current branch
+git checkout main
+git add to-do.md
+git commit -m "chore: mark <feature name> as in-progress in to-do"
+git push
+git checkout -                     # return to previous branch
+git stash pop 2>/dev/null || true  # restore any stashed work
+```
+
+This ensures the updated to-do is on main before the worktree is created in Step 11.
+
+## Step 10 — Create the GitHub issue
 
 Only now, create the issue using `gh issue create` with the feature template:
 
@@ -164,7 +192,7 @@ EOF
 )"
 ```
 
-## Step 10 — Offer worktree creation
+## Step 11 — Offer worktree creation
 
 After the issue is created, ask:
 
