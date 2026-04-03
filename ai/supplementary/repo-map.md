@@ -38,7 +38,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │   │   ├── invoice/                  # Invoice mapping — RawInvoiceData → InvoiceRow
 │   │   ├── money/                    # Pure monetary math (Money type, formatMoney, etc.)
 │   │   ├── plan/                     # Plan input validation + feature parsing
-│   │   └── subscription/             # Subscription access rules (hasActiveAccess, etc.)
+│   │   ├── subscription/             # Subscription access rules (hasActiveAccess, etc.)
+│   │   └── user/                     # User row mapping, status labels, dashboard URLs
 │   ├── services/
 │   │   ├── admin/
 │   │   │   └── planService.ts        # Plan CRUD orchestration (validation + Stripe + DB)
@@ -48,7 +49,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │   │       └── subscriptionSyncService.ts  # Syncs Stripe subscription → DB
 │   ├── infrastructure/
 │   │   ├── database/
-│   │   │   └── client.ts             # Prisma singleton — always import from here
+│   │   │   ├── client.ts             # Prisma singleton — always import from here
+│   │   │   └── user-queries.ts       # Fetches all users with subscription + plan
 │   │   └── stripe/
 │   │       ├── client.ts             # Stripe singleton — always import from here
 │   │       ├── invoices.ts           # Fetches invoices from Stripe API
@@ -65,6 +67,9 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │       ├── (dashboard)/
 │       │   ├── layout.tsx            # Sidebar nav + user button
 │       │   ├── dashboard/page.tsx    # Dashboard home
+│       │   ├── admin/users/
+│       │   │   ├── page.tsx          # Admin user list (Server Component)
+│       │   │   └── user-table.tsx    # User table with search + status filter
 │       │   └── settings/billing/
 │       │       ├── page.tsx              # Billing management + plan upgrade
 │       │       └── invoices/page.tsx     # Invoice history (Server Component)
@@ -113,6 +118,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | SubscriptionSync | `src/services/billing/subscriptionSyncService.ts` | Upserts subscription from Stripe webhook |
 | Plan (domain) | `src/domain/plan/plan.ts` | Plan input validation, feature parsing — pure, no DB/Stripe |
 | Plan (service) | `src/services/admin/planService.ts` | Orchestrates plan CRUD: domain validation + Stripe verification + DB |
+| User (domain) | `src/domain/user/user.ts` | User row mapping, status labels, Clerk/Stripe dashboard URLs |
+| User (infra) | `src/infrastructure/database/user-queries.ts` | Fetches all users with subscription + plan data |
 | Invoice (domain) | `src/domain/invoice/invoice.ts` | Maps raw invoice data → InvoiceRow using Money module |
 | Invoice (infra) | `src/infrastructure/stripe/invoices.ts` | Fetches invoices from Stripe API |
 | Stripe prices | `src/infrastructure/stripe/prices.ts` | Fetches active recurring prices, validates individual price IDs |
@@ -134,6 +141,7 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | Billing settings | `src/app/(dashboard)/settings/billing/page.tsx` | Manage/upgrade subscription |
 | Invoice history | `src/app/(dashboard)/settings/billing/invoices/page.tsx` | Read-only invoice table (Server Component) |
 | Admin plans | `src/app/(dashboard)/admin/plans/page.tsx` | Plan CRUD with Stripe price picker |
+| Admin users | `src/app/(dashboard)/admin/users/page.tsx` | Read-only user table with subscription status |
 | Admin API: prices | `src/app/api/admin/stripe-prices/route.ts` | GET active recurring Stripe prices |
 | Admin API: plans | `src/app/api/admin/plans/route.ts` | POST create plan |
 | Admin API: plan | `src/app/api/admin/plans/[id]/route.ts` | PUT update, DELETE delete plan |
