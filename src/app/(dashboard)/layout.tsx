@@ -1,14 +1,23 @@
 import Link from 'next/link'
+import { currentUser } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
-import { LayoutDashboard, Settings } from 'lucide-react'
+import { LayoutDashboard, Settings, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const navItems = [
+const baseNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const user = await currentUser()
+  const isAdmin = user?.publicMetadata?.role === 'admin'
+
+  const navItems = [
+    ...baseNavItems,
+    ...(isAdmin ? [{ href: '/dashboard/admin', label: 'Admin', icon: Shield }] : []),
+  ]
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
