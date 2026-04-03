@@ -25,4 +25,5 @@ Informal backlog. Each item gets a proper `/spec` and GitHub issue before implem
 
 - [x] **Toast notifications** — global toast/notification system (success, error, info). Wire into existing flows (checkout, billing portal, errors).
 - [x] **Stripe webhook idempotency** — track processed event IDs to prevent duplicate handling on retries.
+- [🔄] **E2E test auth setup** — configure `@clerk/testing` + Playwright global setup so E2E tests can authenticate as an admin user. *(needs: none)*
 
