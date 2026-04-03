@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 const navItems = [
   { href: '/dashboard/admin/plans', label: 'Plans', icon: CreditCard },
   { href: '/dashboard/admin/users', label: 'Users', icon: Users },
-  { href: '#', label: 'Subscriptions', icon: Receipt, disabled: true },
+  { href: '/dashboard/admin/subscriptions', label: 'Subscriptions', icon: Receipt },
 ]
 
 export function AdminSidebar() {
@@ -24,13 +24,11 @@ export function AdminSidebar() {
           <Link
             key={item.label}
             href={item.href}
-            aria-disabled={item.disabled}
             className={cn(
               'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              pathname.startsWith(item.href) && !item.disabled
+              pathname.startsWith(item.href)
                 ? 'bg-accent text-accent-foreground'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-              item.disabled && 'pointer-events-none opacity-50'
+                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
             )}
           >
             <item.icon className="h-4 w-4" />
