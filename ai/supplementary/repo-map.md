@@ -37,8 +37,11 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │   ├── domain/
 │   │   ├── invoice/                  # Invoice mapping — RawInvoiceData → InvoiceRow
 │   │   ├── money/                    # Pure monetary math (Money type, formatMoney, etc.)
+│   │   ├── plan/                     # Plan input validation + feature parsing
 │   │   └── subscription/             # Subscription access rules (hasActiveAccess, etc.)
 │   ├── services/
+│   │   ├── admin/
+│   │   │   └── planService.ts        # Plan CRUD orchestration (validation + Stripe + DB)
 │   │   └── billing/
 │   │       ├── checkoutService.ts    # Creates Stripe Checkout Session
 │   │       ├── portalService.ts      # Creates Stripe Customer Portal session
@@ -48,7 +51,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │   │   │   └── client.ts             # Prisma singleton — always import from here
 │   │   └── stripe/
 │   │       ├── client.ts             # Stripe singleton — always import from here
-│   │       └── invoices.ts           # Fetches invoices from Stripe API
+│   │       ├── invoices.ts           # Fetches invoices from Stripe API
+│   │       └── prices.ts             # Fetches active recurring prices, validates price IDs
 │   └── app/                          # Next.js App Router
 │       ├── layout.tsx                # Root layout — ClerkProvider wraps everything
 │       ├── globals.css               # Tailwind v4 @theme + CSS variable definitions
@@ -68,6 +72,11 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 │           ├── webhooks/
 │           │   ├── clerk/route.ts    # Syncs users from Clerk (user.created/updated/deleted)
 │           │   └── stripe/route.ts   # Syncs subscriptions from Stripe
+│           ├── admin/
+│           │   ├── stripe-prices/route.ts  # GET → active recurring Stripe prices
+│           │   └── plans/
+│           │       ├── route.ts      # POST → create plan
+│           │       └── [id]/route.ts # PUT → update plan, DELETE → delete plan
 │           └── billing/
 │               ├── checkout/route.ts # POST → returns Stripe Checkout URL
 │               └── portal/route.ts   # POST → returns Stripe Portal URL
@@ -81,6 +90,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | Type of change | Location |
 |---|---|
 | Subscription access rules | `src/domain/subscription/subscription.ts` |
+| Plan validation | `src/domain/plan/plan.ts` |
+| Plan CRUD orchestration | `src/services/admin/planService.ts` |
 | Monetary calculations | `src/domain/money/money.ts` |
 | Checkout / portal flow | `src/services/billing/` |
 | Stripe API calls | `src/infrastructure/stripe/client.ts` + services |
@@ -100,8 +111,11 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | CheckoutService | `src/services/billing/checkoutService.ts` | Creates Stripe Checkout Session |
 | PortalService | `src/services/billing/portalService.ts` | Creates Stripe Customer Portal session |
 | SubscriptionSync | `src/services/billing/subscriptionSyncService.ts` | Upserts subscription from Stripe webhook |
+| Plan (domain) | `src/domain/plan/plan.ts` | Plan input validation, feature parsing — pure, no DB/Stripe |
+| Plan (service) | `src/services/admin/planService.ts` | Orchestrates plan CRUD: domain validation + Stripe verification + DB |
 | Invoice (domain) | `src/domain/invoice/invoice.ts` | Maps raw invoice data → InvoiceRow using Money module |
 | Invoice (infra) | `src/infrastructure/stripe/invoices.ts` | Fetches invoices from Stripe API |
+| Stripe prices | `src/infrastructure/stripe/prices.ts` | Fetches active recurring prices, validates individual price IDs |
 | Stripe client | `src/infrastructure/stripe/client.ts` | Stripe singleton |
 | Prisma client | `src/infrastructure/database/client.ts` | Prisma singleton |
 | Clerk webhook | `src/app/api/webhooks/clerk/route.ts` | Creates/updates/deletes User in DB |
@@ -119,6 +133,10 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | Profile settings | `src/app/(dashboard)/settings/page.tsx` | Clerk `<UserProfile />` inline |
 | Billing settings | `src/app/(dashboard)/settings/billing/page.tsx` | Manage/upgrade subscription |
 | Invoice history | `src/app/(dashboard)/settings/billing/invoices/page.tsx` | Read-only invoice table (Server Component) |
+| Admin plans | `src/app/(dashboard)/admin/plans/page.tsx` | Plan CRUD with Stripe price picker |
+| Admin API: prices | `src/app/api/admin/stripe-prices/route.ts` | GET active recurring Stripe prices |
+| Admin API: plans | `src/app/api/admin/plans/route.ts` | POST create plan |
+| Admin API: plan | `src/app/api/admin/plans/[id]/route.ts` | PUT update, DELETE delete plan |
 | Clerk webhook | `src/app/api/webhooks/clerk/route.ts` | User sync from Clerk |
 | Stripe webhook | `src/app/api/webhooks/stripe/route.ts` | Subscription sync from Stripe |
 

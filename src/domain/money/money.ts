@@ -7,6 +7,12 @@
 
 export type Currency = 'USD' | 'EUR' | 'GBP' | 'CAD'
 
+export const SUPPORTED_CURRENCIES: readonly Currency[] = ['USD', 'EUR', 'GBP', 'CAD']
+
+export function isSupportedCurrency(value: string): value is Currency {
+  return SUPPORTED_CURRENCIES.includes(value.toUpperCase() as Currency)
+}
+
 export type Money = {
   amount: number // in smallest unit (cents)
   currency: Currency
