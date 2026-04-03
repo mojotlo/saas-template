@@ -14,15 +14,21 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /global\.setup\.ts/,
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.clerk/user.json',
+      },
+      dependencies: ['setup'],
     },
   ],
-  // Start dev server automatically before e2e tests
-  // Uncomment and update when you have a dev server configured
-  // webServer: {
-  //   command: 'npm run dev',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
 })

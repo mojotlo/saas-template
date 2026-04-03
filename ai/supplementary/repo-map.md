@@ -179,3 +179,4 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | `clsx` + `tailwind-merge` | Class name utilities |
 | `lucide-react` | Icons |
 | `@radix-ui/*` | Accessible UI primitives |
+| `@clerk/testing` | Clerk E2E testing utilities (dev only) |
