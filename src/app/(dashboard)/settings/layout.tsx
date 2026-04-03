@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 const tabs = [
   { href: '/dashboard/settings', label: 'Profile' },
   { href: '/dashboard/settings/billing', label: 'Billing' },
+  { href: '/dashboard/settings/billing/invoices', label: 'Invoices' },
 ]
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
