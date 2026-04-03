@@ -7,6 +7,8 @@ import {
   formatMoney,
   isZero,
   isGreaterThan,
+  isSupportedCurrency,
+  SUPPORTED_CURRENCIES,
   MoneyError,
 } from './money'
 
@@ -170,5 +172,29 @@ describe('isGreaterThan', () => {
     const eur = createMoney(500, 'EUR')
     expect(() => isGreaterThan(usd, eur)).toThrow(MoneyError)
     expect(() => isGreaterThan(usd, eur)).toThrow('Cannot compare different currencies')
+  })
+})
+
+describe('SUPPORTED_CURRENCIES', () => {
+  it('contains USD, EUR, GBP, CAD', () => {
+    expect(SUPPORTED_CURRENCIES).toEqual(['USD', 'EUR', 'GBP', 'CAD'])
+  })
+})
+
+describe('isSupportedCurrency', () => {
+  it('returns true for supported currencies', () => {
+    expect(isSupportedCurrency('USD')).toBe(true)
+    expect(isSupportedCurrency('EUR')).toBe(true)
+    expect(isSupportedCurrency('GBP')).toBe(true)
+    expect(isSupportedCurrency('CAD')).toBe(true)
+  })
+
+  it('returns true for lowercase supported currencies', () => {
+    expect(isSupportedCurrency('usd')).toBe(true)
+  })
+
+  it('returns false for unsupported currencies', () => {
+    expect(isSupportedCurrency('JPY')).toBe(false)
+    expect(isSupportedCurrency('AUD')).toBe(false)
   })
 })
