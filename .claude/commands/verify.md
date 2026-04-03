@@ -35,7 +35,11 @@ Work through each step in order. Do not proceed if a step fails — fix it first
 - If no changed files are in those layers, skip this step
 
 ### 5. Browser verification
-- Run `npm run dev` in the background
+- Start the dev server in the background: `npm run dev &`
+- Wait for it to be ready using Node fetch:
+  ```bash
+  node -e "const wait = () => fetch('http://localhost:3000').then(() => console.log('ready')).catch(() => setTimeout(wait, 1000)); setTimeout(wait, 2000)"
+  ```
 - Use Playwright to open the app and verify:
   - App loads without errors
   - Key pages/routes are reachable

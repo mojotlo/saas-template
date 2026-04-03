@@ -6,6 +6,24 @@ Add a note here whenever Claude makes the same mistake twice.
 
 ---
 
+## Subagent model routing (pending Claude Code fix)
+
+Intent: main session on Opus, subagents on Sonnet except `/code-review` which stays on Opus
+since it requires architectural judgment.
+
+Current status: the `model:` field in agent frontmatter is unreliable for Task-tool-spawned
+subagents (known bug: github.com/anthropics/claude-code/issues/5456). The
+`CLAUDE_CODE_SUBAGENT_MODEL` env var works globally but can't exclude `/code-review`.
+
+For now: leave as inherit (Opus). Revisit when the bug is resolved.
+
+When fixed, implement as:
+1. Add `export CLAUDE_CODE_SUBAGENT_MODEL=sonnet` to `.zshrc`
+2. Convert `/code-review` to `.claude/agents/code-review.md` with `model: opus` frontmatter
+   so it overrides the env var for that specific agent
+
+---
+
 ## Domain rules
 
 - `User.id` in Prisma is the Clerk user ID (not a generated cuid) — intentional, avoids a join

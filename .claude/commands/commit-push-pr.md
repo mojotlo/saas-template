@@ -31,18 +31,38 @@ git stash pop 2>/dev/null || true
 
 If the item is not in to-do.md or is already marked `[x]`, skip this step.
 
-### 2. Commit
+### 2. Update repo map
+
+Check the diff for structural changes and update repo-map files before committing.
+
+```bash
+git diff main --name-only
+```
+
+For each type of change detected:
+
+| What changed | Where to update |
+|---|---|
+| New module or significant file | `ai/supplementary/repo-map.md` Key Modules |
+| New page or API route | `ai/supplementary/repo-map.md` Entry Points |
+| New frozen / sensitive area | `ai/supplementary/repo-map.md` Frozen Areas |
+| New npm dependency | `ai/supplementary/repo-map.md` External Dependencies |
+| New layer or critical singleton | `ai/core/repo-map.md` |
+
+If nothing structural changed, skip this step.
+
+### 3. Commit
 
 - Run `git add -A`
 - Write a commit message that accurately describes the changes from the diff
 - Format: `<type>: <short description>` (types: feat, fix, refactor, test, docs, chore)
 - Run `git commit -m "<message>"`
 
-### 3. Push
+### 4. Push
 
 - Run `git push -u origin HEAD`
 
-### 4. Open PR
+### 5. Open PR
 
 - Run `gh pr create` with:
   - Title matching the commit message
@@ -60,7 +80,7 @@ If the item is not in to-do.md or is already marked `[x]`, skip this step.
 <specific steps to verify the change works>
 ```
 
-### 5. Monitor CI
+### 6. Monitor CI
 
 - Wait 5 seconds for CI to start
 - Run `gh run watch` to monitor CI in real time
@@ -71,7 +91,7 @@ If the item is not in to-do.md or is already marked `[x]`, skip this step.
   3. Run `git add -A && git commit -m "fix: <what was fixed>" && git push`
   4. Wait for CI to re-run and repeat until green
 
-### 6. Post-merge cleanup reminder
+### 7. Post-merge cleanup reminder
 
 Once CI is green and the PR is open, print the following so it's ready to paste
 after the PR is merged:

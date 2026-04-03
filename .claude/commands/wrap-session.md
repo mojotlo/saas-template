@@ -51,20 +51,7 @@ context files. These are candidates for CLAUDE.md or project-notes updates.>
 <Anything unresolved that the next session should pick up.>
 ```
 
-## Step 3 — Update the repo map
-
-If any new modules, files, routes, or external dependencies were added this session,
-update the relevant repo-map sections now:
-
-- New module or significant file → add to `ai/supplementary/repo-map.md` Key Modules table
-- New entry point (page, API route) → add to Entry Points table
-- New frozen area → add to Frozen / Sensitive Areas table
-- New npm dependency → add to External Dependencies table
-- New layer or singleton → update `ai/core/repo-map.md`
-
-If nothing structural changed, skip this step.
-
-## Step 4 — Propose updates
+## Step 3 — Propose updates
 
 Based on "Patterns noticed", identify specific additions that would prevent
 the same confusion in future sessions. Route each to the most specific file
@@ -95,11 +82,11 @@ Approve? (yes / no / modify)
 
 Wait for approval on each before applying any.
 
-## Step 5 — Apply approved updates
+## Step 4 — Apply approved updates
 
 Edit the appropriate files and confirm each edit was applied.
 
-## Step 6 — Stage the session log
+## Step 5 — Stage the session log
 
 ```bash
 git add ai/sessions/
