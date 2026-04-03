@@ -107,6 +107,41 @@ Do not interpret tasks broadly. Do not do unrequested work.
 
 ---
 
+## Testing Strategy
+
+This project uses a layered test approach. Each layer has a specific tool — do not
+try to unit test what belongs in integration, or vice versa.
+
+| Layer | Tool | Command | Requires |
+|---|---|---|---|
+| `src/domain/` | Vitest unit tests | `npm test` | Nothing |
+| `src/services/` | Vitest integration tests | `npm run test:integration` | Docker Postgres |
+| `src/app/` API routes | Vitest integration tests | `npm run test:integration` | Docker Postgres |
+| `src/app/` UI flows | Playwright e2e | `/verify` | Dev server |
+
+**The vitest coverage exclusions are intentional** — services and app layer are
+excluded from unit test coverage because they are covered by integration tests.
+Do not treat the coverage exclusion message as a gap to fill with unit tests.
+
+**When to run integration tests:**
+- Any change to `src/services/`
+- Any change to `src/app/api/` routes
+- Any change to `src/infrastructure/`
+- Any new Prisma model or migration
+
+**Running integration tests:**
+```bash
+docker compose up -d       # start Postgres (once per session)
+npm run test:integration   # run integration suite
+docker compose down        # stop when done
+```
+
+**Adding cleanup for new models:** When adding a model to `schema.prisma`,
+add a `deleteMany()` call to `tests/integration/setup.ts` in reverse
+dependency order (children before parents).
+
+---
+
 ## Verification
 
 After every meaningful code change — not just at end of session:
@@ -115,6 +150,7 @@ After every meaningful code change — not just at end of session:
 2. Read `test-results/summary.txt` — understand exactly what passed, failed, or has coverage gaps
 3. Fix any failures before moving to the next change
 4. Run `npm run lint` and `npm run typecheck` before committing
+5. If the change touches services, API routes, or infrastructure: run `npm run test:integration`
 
 If tests fail:
 - Read the full error in `test-results/results.json` for stack traces

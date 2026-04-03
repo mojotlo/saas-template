@@ -81,7 +81,7 @@ after the PR is merged:
 
 After merging, run this from the main repo to clean up:
 
-  cd ~/Documents/dev/<repo-name> && bash scripts/cleanup-worktree.sh <issue-number>
+  cd ../<repo-name> && bash scripts/cleanup-worktree.sh <issue-number>
 ```
 
 Derive `<repo-name>` from `git rev-parse --show-toplevel` and `<issue-number>`

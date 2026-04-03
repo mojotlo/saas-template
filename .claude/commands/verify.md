@@ -28,7 +28,13 @@ Work through each step in order. Do not proceed if a step fails — fix it first
 - If coverage is below 100% — write tests to fill gaps, re-run
 - Do not proceed until summary.txt shows ✅ PASSED with 100% coverage
 
-### 4. Browser verification
+### 4. Integration tests
+- Check whether any changed files are in `src/services/`, `src/app/api/`, or `src/infrastructure/`
+- If yes: run `docker compose up -d && npm run test:integration`
+- If integration tests fail — fix them before continuing
+- If no changed files are in those layers, skip this step
+
+### 5. Browser verification
 - Run `npm run dev` in the background
 - Use Playwright to open the app and verify:
   - App loads without errors
@@ -39,7 +45,7 @@ Work through each step in order. Do not proceed if a step fails — fix it first
 
 ## Success condition
 
-All four steps pass with no errors. Report the contents of `test-results/summary.txt`
+All five steps pass with no errors. Report the contents of `test-results/summary.txt`
 plus a summary of what was verified in the browser.
 
 ## Rules
