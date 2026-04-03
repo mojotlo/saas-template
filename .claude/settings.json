@@ -16,6 +16,7 @@
       "mcp__playwright__browser_console_messages",
       "mcp__playwright__browser_close",
       "Bash(ls *)",
+      "Bash(tail *)",
       "Bash(npm run *)",
       "Bash(npm test:*)",
       "Bash(sleep *)",

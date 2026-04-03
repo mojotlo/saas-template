@@ -152,6 +152,13 @@ After every meaningful code change — not just at end of session:
 4. Run `npm run lint` and `npm run typecheck` before committing
 5. If the change touches services, API routes, or infrastructure: run `npm run test:integration`
 
+**Running a single test file during development:**
+Use `npx vitest run <path>` to run one file without the full suite overhead:
+```bash
+npx vitest run src/domain/subscription/subscription.test.ts
+```
+This does not write `test-results/summary.txt` — use `npm test` for the final verification pass.
+
 If tests fail:
 - Read the full error in `test-results/results.json` for stack traces
 - Fix the code or the test — never skip or comment out failing tests
