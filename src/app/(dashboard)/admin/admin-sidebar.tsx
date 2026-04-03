@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 const navItems = [
   { href: '/dashboard/admin/plans', label: 'Plans', icon: CreditCard },
   { href: '/dashboard/admin/users', label: 'Users', icon: Users },
-  { href: '#', label: 'Subscriptions', icon: Receipt, disabled: true },
+  { href: '/dashboard/admin/subscriptions', label: 'Subscriptions', icon: Receipt },
 ]
 
 export function AdminSidebar() {

@@ -113,6 +113,8 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 |---|---|---|
 | Money | `src/domain/money/money.ts` | Pure monetary math — all amounts in cents |
 | Subscription | `src/domain/subscription/subscription.ts` | Access control rules — no DB calls |
+| Subscription Admin | `src/domain/subscription/admin.ts` | MRR calculation, status counts, row mapping — pure, no DB |
+| Subscription queries | `src/infrastructure/database/subscription-queries.ts` | Fetches subscriptions with user + plan joins |
 | CheckoutService | `src/services/billing/checkoutService.ts` | Creates Stripe Checkout Session |
 | PortalService | `src/services/billing/portalService.ts` | Creates Stripe Customer Portal session |
 | SubscriptionSync | `src/services/billing/subscriptionSyncService.ts` | Upserts subscription from Stripe webhook |
@@ -142,6 +144,7 @@ For quick orientation, `ai/core/repo-map.md` is sufficient.
 | Invoice history | `src/app/(dashboard)/settings/billing/invoices/page.tsx` | Read-only invoice table (Server Component) |
 | Admin plans | `src/app/(dashboard)/admin/plans/page.tsx` | Plan CRUD with Stripe price picker |
 | Admin users | `src/app/(dashboard)/admin/users/page.tsx` | Read-only user table with subscription status |
+| Admin subscriptions | `src/app/(dashboard)/admin/subscriptions/page.tsx` | Subscription overview with stat cards + filterable table |
 | Admin API: prices | `src/app/api/admin/stripe-prices/route.ts` | GET active recurring Stripe prices |
 | Admin API: plans | `src/app/api/admin/plans/route.ts` | POST create plan |
 | Admin API: plan | `src/app/api/admin/plans/[id]/route.ts` | PUT update, DELETE delete plan |
