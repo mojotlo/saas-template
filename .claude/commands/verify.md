@@ -45,7 +45,10 @@ Work through each step in order. Do not proceed if a step fails — fix it first
   - Key pages/routes are reachable
   - No console errors
   - Core user flows work end to end
-- Kill the dev server when done: `lsof -ti:3000 | xargs kill -9`
+- Kill the dev server when done:
+  ```bash
+  node -e "try { require('child_process').execSync('kill \$(lsof -ti:3000)') } catch(e) {}"
+  ```
 
 ## Success condition
 
